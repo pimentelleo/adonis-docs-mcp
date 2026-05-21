@@ -9,11 +9,6 @@ authors = [
     { name = "pimen" }
 ]
 keywords = ["mcp", "adonisjs", "documentation", "ai", "llm"]
-
-[project.urls]
-Homepage = "https://github.com/pimentelleo/adonis-docs-mcp"
-Repository = "https://github.com/pimentelleo/adonis-docs-mcp"
-Issues = "https://github.com/pimentelleo/adonis-docs-mcp/issues"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -25,6 +20,11 @@ dependencies = [
     "mcp[cli]>=1.9.0",
     "httpx>=0.28.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/pimentelleo/adonis-docs-mcp"
+Repository = "https://github.com/pimentelleo/adonis-docs-mcp"
+Issues = "https://github.com/pimentelleo/adonis-docs-mcp/issues"
 
 [project.scripts]
 adonis-docs-mcp = "adonis_docs_mcp.server:main"
