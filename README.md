@@ -106,7 +106,7 @@ search_docs(query="middleware", version="all")
 
 ```bash
 # Clone and install
-git clone <repo-url>
+git clone https://github.com/pimentelleo/adonis-docs-mcp.git
 cd adonis-docs-mcp
 uv sync
 
@@ -116,6 +116,28 @@ uv run adonis-docs-mcp
 # Test with MCP Inspector
 npx @modelcontextprotocol/inspector uv run adonis-docs-mcp
 ```
+
+## Publishing (maintainers)
+
+This project uses [PyPI Trusted Publishing](https://docs.pypi.org/trusted-publishers/) via GitHub Actions.
+
+### One-time setup
+
+1. Go to https://pypi.org/manage/account/publishing/
+2. Add a new **pending publisher**:
+   - **Project name:** `adonis-docs-mcp`
+   - **Owner:** `pimentelleo`
+   - **Repository:** `adonis-docs-mcp`
+   - **Workflow name:** `publish.yml`
+   - **Environment name:** `pypi`
+3. Save
+
+### Releasing a new version
+
+1. Update `version` in `pyproject.toml` and `src/adonis_docs_mcp/__init__.py`
+2. Commit and push
+3. Create a GitHub release (tag format: `v0.1.0`)
+4. The publish workflow will automatically build and upload to PyPI
 
 ## License
 
