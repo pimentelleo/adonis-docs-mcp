@@ -13,6 +13,7 @@ from .fetcher import (
     get_section_structure,
 )
 from .models import VERSIONS, ADONIS_VERSIONS
+from .prompts.adonisjs_stack import ADONISJS_STACK_GUIDELINES
 
 mcp = FastMCP(
     "AdonisJS Docs",
@@ -29,7 +30,7 @@ mcp = FastMCP(
 
 def _get_client() -> httpx.AsyncClient:
     return httpx.AsyncClient(
-        headers={"User-Agent": "adonis-docs-mcp/0.2.0"},
+        headers={"User-Agent": "adonis-docs-mcp/0.3.0"},
         follow_redirects=True,
     )
 
@@ -360,6 +361,17 @@ async def clear_cache() -> str:
     """
     count = cache.clear()
     return f"Cleared {count} cached file(s)."
+
+
+@mcp.prompt()
+def adonisjs_stack() -> str:
+    """Development guidelines for AdonisJS v7 + Edge.js monolithic projects.
+
+    Load this prompt before working on an AdonisJS v7 + Edge.js monolithic
+    project. It provides anti-AI-slop rules, architecture constraints, and
+    conventions for server-rendered applications.
+    """
+    return ADONISJS_STACK_GUIDELINES
 
 
 def main():
