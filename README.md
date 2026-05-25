@@ -84,6 +84,14 @@ Add to your MCP config:
 | `edge_get_doc` | Fetch the full markdown content of an Edge.js doc page |
 | `edge_search_docs` | Search Edge.js docs by keyword |
 
+### Development Guidelines
+
+| Tool | Description |
+|------|-------------|
+| `get_backend_guidelines` | AdonisJS v7 backend rules: architecture, Edge templates, controllers, forms, models, assets |
+| `get_frontend_guidelines` | Frontend anti-slop rules: semantic HTML, typography, color, layout, spacing, accessibility |
+| `get_code_quality_guidelines` | Code quality anti-slop rules: surgical changes, no comment spam, no bloat, domain naming |
+
 ## Examples
 
 ```
@@ -110,6 +118,11 @@ edge_get_doc(permalink="components/introduction")
 
 # Search Edge.js docs
 edge_search_docs(query="slots")
+
+# Load guidelines before working on a project
+get_backend_guidelines()
+get_frontend_guidelines()
+get_code_quality_guidelines()
 ```
 
 ## Configuration

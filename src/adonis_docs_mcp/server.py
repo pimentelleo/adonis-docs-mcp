@@ -13,7 +13,12 @@ from .fetcher import (
     get_section_structure,
 )
 from .models import VERSIONS, ADONIS_VERSIONS
-from .prompts.adonisjs_stack import ADONISJS_STACK_GUIDELINES
+from .prompts.adonisjs_stack import (
+    ADONISJS_STACK_GUIDELINES,
+    BACKEND_GUIDELINES,
+    CODE_QUALITY_GUIDELINES,
+    FRONTEND_GUIDELINES,
+)
 
 mcp = FastMCP(
     "AdonisJS Docs",
@@ -23,14 +28,17 @@ mcp = FastMCP(
         "Use list_versions to see available AdonisJS versions, list_sections to browse "
         "the doc structure, get_doc to read a specific page, and search_docs "
         "to find relevant documentation. "
-        "For Edge.js templates, use edge_list_sections, edge_get_doc, and edge_search_docs."
+        "For Edge.js templates, use edge_list_sections, edge_get_doc, and edge_search_docs. "
+        "Before starting work on an AdonisJS v7 + Edge.js project, call "
+        "get_backend_guidelines, get_frontend_guidelines, and get_code_quality_guidelines "
+        "to load development rules and anti-AI-slop conventions."
     ),
 )
 
 
 def _get_client() -> httpx.AsyncClient:
     return httpx.AsyncClient(
-        headers={"User-Agent": "adonis-docs-mcp/0.4.0"},
+        headers={"User-Agent": "adonis-docs-mcp/0.5.0"},
         follow_redirects=True,
     )
 
@@ -351,6 +359,48 @@ async def edge_search_docs(query: str) -> str:
         lines.append(f"  ... and {len(results) - 20} more results. Refine your query for better results.")
 
     return "\n".join(lines)
+
+
+@mcp.tool()
+async def get_backend_guidelines() -> str:
+    """Get AdonisJS v7 backend development guidelines.
+
+    Returns architecture rules, Edge template conventions, controller patterns,
+    form/validation rules, model/database conventions, and asset handling for
+    server-rendered monolithic AdonisJS v7 + Edge.js applications.
+
+    Call this before working on AdonisJS backend code (routes, controllers,
+    models, services, validators, Edge views).
+    """
+    return BACKEND_GUIDELINES
+
+
+@mcp.tool()
+async def get_frontend_guidelines() -> str:
+    """Get frontend anti-slop guidelines for HTML, CSS, and UI development.
+
+    Returns rules for writing high-quality frontend code in Edge templates:
+    semantic HTML, typography, color, layout, spacing, borders/shadows,
+    animation, accessibility, responsive design, icons, and component states.
+
+    These rules prevent the generic "AI-averaged" look that plagues generated
+    frontend code. Call this before writing or editing HTML/CSS in Edge templates.
+    """
+    return FRONTEND_GUIDELINES
+
+
+@mcp.tool()
+async def get_code_quality_guidelines() -> str:
+    """Get anti-slop code quality rules for any code changes.
+
+    Returns rules to prevent low-quality AI-generated code: surgical changes
+    only, no comment spam, no filler content, no bloated output, no invented
+    structure, no unnecessary abstractions, no dependency additions, no
+    speculative code, no SPA leakage, and domain-specific naming.
+
+    Call this before making any code changes to an AdonisJS project.
+    """
+    return CODE_QUALITY_GUIDELINES
 
 
 @mcp.tool()

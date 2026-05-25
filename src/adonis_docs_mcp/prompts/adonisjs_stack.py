@@ -1,12 +1,9 @@
 """Development guidelines for AdonisJS v7 + Edge.js monolithic projects."""
 
-ADONISJS_STACK_GUIDELINES = """\
-# AdonisJS v7 + Edge.js — Development Guidelines
+BACKEND_GUIDELINES = """\
+# AdonisJS v7 Backend Guidelines
 
-You are working on a **server-rendered monolithic** application built with
-AdonisJS v7 and Edge.js templates. Follow these rules strictly.
-
----
+Follow these rules when writing backend code in an AdonisJS v7 project.
 
 ## Architecture: Server-Rendered Monolith
 
@@ -77,104 +74,27 @@ AdonisJS v7 and Edge.js templates. Follow these rules strictly.
 - Do not add npm packages for things that can be done with a few lines of
   vanilla JS (dropdowns, toggles, modals).
 
----
+## When Unsure
 
-## Anti-Slop Rules
+- Use `get_doc` and `search_docs` to look up the official AdonisJS v7
+  documentation before guessing.
+- Use `edge_get_doc` and `edge_search_docs` for Edge template syntax.
+- Read existing project code to understand conventions before adding new code.
+"""
 
-Inspired by peakoss/anti-slop, Hallmark, and anti-slop-design — these rules
-target the specific patterns that make AI-generated code and UI low-quality.
-Anti-slop, not anti-AI: genuinely good work is fine, lazy generated slop is not.
 
-### Surgical changes only
+FRONTEND_GUIDELINES = """\
+# Frontend Development Guidelines (Anti-Slop)
 
-- Touch only the files directly related to what was asked. Do not "improve"
-  unrelated files, refactor nearby code, or reorganize the project.
-- Keep changes small and focused. If a task needs 10 lines, write 10 lines.
-  A 500-line diff for a simple feature is slop.
-- Do not modify root config files (`package.json`, `tsconfig.json`,
-  `.env.example`, `README.md`) unless the task explicitly requires it.
+Follow these rules when writing HTML, CSS, and frontend code in Edge templates.
+Every page should look intentional and designed, not like the statistical mean
+of every website the AI was trained on.
 
-### No comment spam
-
-- Do not add excessive inline comments. Code should be self-explanatory.
-- Only comment *why* something non-obvious is done, never *what* the code does.
-- Do not add file-header comments, section dividers (`// ---- Section ----`),
-  or JSDoc blocks to every function.
-- A file with more new comments than new logic is slop.
-
-### No filler content
-
-- Never output "Lorem ipsum", "TODO: implement", "Add your content here",
-  "Example text", or any placeholder.
-- Do not generate sample/demo data unless explicitly asked.
-- Every string, label, and message must be real and contextual.
-- Do not fabricate metrics ("50,000+ users", "+47% conversion") or
-  testimonials. Use real data or a labelled placeholder (`—`).
-
-### No bloated output
-
-- Do not produce verbose explanations inside code. If something needs
-  explaining, a single short comment suffices.
-- Do not add multiple alternative approaches in comments ("you could also...").
-- Do not add console.log/debug statements unless debugging was requested.
-- Do not add emoji to code, commit messages, or comments.
-
-### No invented structure
-
-- Follow the project's existing file layout exactly. Look at how the project
-  organizes controllers, models, views, and services before creating files.
-- Do not create new top-level directories, new config files, or new
-  organizational patterns.
-- Name files and classes using the project's existing naming conventions —
-  check existing files first.
-
-### No unnecessary abstractions
-
-- Do not create wrapper classes, base classes, utility modules, or "helper"
-  files unless there is clear, repeated usage (3+ existing call sites).
-- Do not add design patterns (Strategy, Factory, Observer) unless the
-  complexity genuinely demands it.
-- Do not create interfaces/types for objects used in only one place.
-
-### No dependency additions
-
-- Do not add new npm packages, frameworks, or tools unless explicitly asked.
-- Work with what is already in `package.json`. Check existing dependencies
-  before suggesting new ones.
-- Especially do not add: CSS frameworks, animation libraries, icon packs,
-  utility libraries (lodash, etc.), or testing tools not already present.
-
-### No speculative code
-
-- Build exactly what was asked. Do not add features, error handling, edge
-  cases, or extensibility points that were not requested.
-- Do not add "future-proofing" abstractions or configuration options.
-- Do not handle errors that cannot realistically occur in the current context.
-
-### No SPA leakage
-
-- No `fetch()` / `axios` calls to render content that should be
-  server-rendered.
-- No client-side state management (Redux, Pinia, stores, signals).
-- No client-side routing or history manipulation.
-- No virtual DOM, reactive bindings, or component lifecycle in the browser.
-
-### Use domain-specific naming
-
-- Use names from the business domain: `InvoiceController`, not
-  `DataController`; `billing/show.edge`, not `page.edge`.
-- Match the naming style already used in the project.
-- No generic names: `utils.ts`, `helpers.ts`, `common.ts`, `misc.ts`.
+Inspired by Hallmark, anti-slop-design, and peakoss/anti-slop.
 
 ---
 
-## Frontend Anti-Slop Rules
-
-These rules specifically target the generic, "AI-averaged" look that plagues
-generated frontend code. Every page should look intentional and designed, not
-like the statistical mean of every website the AI was trained on.
-
-### Semantic HTML — no div soup
+## Semantic HTML — no div soup
 
 - Use proper semantic elements: `<header>`, `<nav>`, `<main>`, `<article>`,
   `<section>`, `<aside>`, `<footer>`, `<figure>`, `<figcaption>`, `<details>`,
@@ -185,7 +105,7 @@ like the statistical mean of every website the AI was trained on.
 - Use `<button>` for actions and `<a>` for navigation. Never use
   `<div onclick>` or `<span class="link">`.
 
-### Typography — no default font stacks
+## Typography — no default font stacks
 
 - Do not default to Inter, Roboto, or Open Sans for everything. Use what the
   project already has configured, or choose fonts intentional to the domain.
@@ -196,7 +116,7 @@ like the statistical mean of every website the AI was trained on.
 - Use fluid type scales (`clamp()`) instead of hardcoded pixel sizes when
   possible.
 
-### Color — no gratuitous gradients
+## Color — no gratuitous gradients
 
 - Do not add purple-to-blue or purple-to-pink gradients. This is the #1 tell
   of AI-generated UI.
@@ -209,7 +129,7 @@ like the statistical mean of every website the AI was trained on.
 - Do not rely on color alone to convey meaning (errors, status). Always
   pair with text, icons, or patterns for accessibility.
 
-### Layout — no centered-hero trinity
+## Layout — no centered-hero trinity
 
 - Do not default to: centered hero → three equal columns → CTA → footer.
   This layout is the AI slop signature.
@@ -218,7 +138,7 @@ like the statistical mean of every website the AI was trained on.
 - Use CSS Grid and Flexbox purposefully. Not every container needs
   `display: flex; align-items: center; justify-content: center`.
 
-### Spacing — no uniform gaps
+## Spacing — no uniform gaps
 
 - Do not use the same `gap` or `padding` value everywhere. Space should
   reflect content hierarchy: section gaps > card gaps > content gaps.
@@ -228,7 +148,7 @@ like the statistical mean of every website the AI was trained on.
 - Avoid magic numbers — if a value like `padding: 37px` appears, it
   should be explainable.
 
-### Borders & Shadows — no copy-paste elevation
+## Borders & Shadows — no copy-paste elevation
 
 - Do not apply the same `1px solid #E5E7EB` border and
   `box-shadow: 0 2px 4px rgba(0,0,0,0.1)` to every card.
@@ -237,7 +157,7 @@ like the statistical mean of every website the AI was trained on.
 - Vary `border-radius` by component size — a card and a button inside it
   should not have identical corner rounding.
 
-### Animation — respect motion preferences
+## Animation — respect motion preferences
 
 - Always wrap animations in `@media (prefers-reduced-motion: no-preference)`.
   This is not optional — it is an accessibility requirement.
@@ -246,7 +166,7 @@ like the statistical mean of every website the AI was trained on.
   calls for it.
 - Do not animate everything. Static content should stay static.
 
-### Accessibility — built in, not bolted on
+## Accessibility — built in, not bolted on
 
 - All interactive elements must have visible `:focus-visible` styles.
   Never remove `outline` without providing an alternative.
@@ -258,7 +178,7 @@ like the statistical mean of every website the AI was trained on.
 - Use appropriate HTML `type` attributes: `type="email"`, `type="tel"`,
   `type="url"`, `type="search"`.
 
-### Responsive — mobile-first, tested at real breakpoints
+## Responsive — mobile-first, tested at real breakpoints
 
 - Write CSS mobile-first: base styles for small screens, then
   `@media (min-width: ...)` for larger ones.
@@ -268,7 +188,7 @@ like the statistical mean of every website the AI was trained on.
 - Headings and buttons must never wrap awkwardly on mobile — they should
   be readable at any width.
 
-### Icons — no Heroicons everywhere
+## Icons — no Heroicons everywhere
 
 - Use the icon set already in the project. If none exists, prefer Lucide
   or Phosphor over Heroicons for variety.
@@ -276,18 +196,111 @@ like the statistical mean of every website the AI was trained on.
   do the work.
 - Do not add icon libraries just for one or two icons — use inline SVG.
 
-### Component states — not just the happy path
+## Component states — not just the happy path
 
 - Every interactive component should handle: default, hover, focus, active,
   disabled, loading, and error states.
 - Do not only build the "success" version. A form without error states, a
   button without a disabled state, or a list without an empty state is
   incomplete.
-
-## When Unsure
-
-- Use `get_doc` and `search_docs` to look up the official AdonisJS v7
-  documentation before guessing.
-- Use `edge_get_doc` and `edge_search_docs` for Edge template syntax.
-- Read existing project code to understand conventions before adding new code.
 """
+
+
+CODE_QUALITY_GUIDELINES = """\
+# Code Quality Guidelines (Anti-Slop)
+
+Follow these rules when writing any code. They target the specific patterns
+that make AI-generated code low-quality. Anti-slop, not anti-AI: genuinely
+good work is fine, lazy generated slop is not.
+
+Inspired by peakoss/anti-slop.
+
+---
+
+## Surgical changes only
+
+- Touch only the files directly related to what was asked. Do not "improve"
+  unrelated files, refactor nearby code, or reorganize the project.
+- Keep changes small and focused. If a task needs 10 lines, write 10 lines.
+  A 500-line diff for a simple feature is slop.
+- Do not modify root config files (`package.json`, `tsconfig.json`,
+  `.env.example`, `README.md`) unless the task explicitly requires it.
+
+## No comment spam
+
+- Do not add excessive inline comments. Code should be self-explanatory.
+- Only comment *why* something non-obvious is done, never *what* the code does.
+- Do not add file-header comments, section dividers (`// ---- Section ----`),
+  or JSDoc blocks to every function.
+- A file with more new comments than new logic is slop.
+
+## No filler content
+
+- Never output "Lorem ipsum", "TODO: implement", "Add your content here",
+  "Example text", or any placeholder.
+- Do not generate sample/demo data unless explicitly asked.
+- Every string, label, and message must be real and contextual.
+- Do not fabricate metrics ("50,000+ users", "+47% conversion") or
+  testimonials. Use real data or a labelled placeholder (`—`).
+
+## No bloated output
+
+- Do not produce verbose explanations inside code. If something needs
+  explaining, a single short comment suffices.
+- Do not add multiple alternative approaches in comments ("you could also...").
+- Do not add console.log/debug statements unless debugging was requested.
+- Do not add emoji to code, commit messages, or comments.
+
+## No invented structure
+
+- Follow the project's existing file layout exactly. Look at how the project
+  organizes controllers, models, views, and services before creating files.
+- Do not create new top-level directories, new config files, or new
+  organizational patterns.
+- Name files and classes using the project's existing naming conventions —
+  check existing files first.
+
+## No unnecessary abstractions
+
+- Do not create wrapper classes, base classes, utility modules, or "helper"
+  files unless there is clear, repeated usage (3+ existing call sites).
+- Do not add design patterns (Strategy, Factory, Observer) unless the
+  complexity genuinely demands it.
+- Do not create interfaces/types for objects used in only one place.
+
+## No dependency additions
+
+- Do not add new npm packages, frameworks, or tools unless explicitly asked.
+- Work with what is already in `package.json`. Check existing dependencies
+  before suggesting new ones.
+- Especially do not add: CSS frameworks, animation libraries, icon packs,
+  utility libraries (lodash, etc.), or testing tools not already present.
+
+## No speculative code
+
+- Build exactly what was asked. Do not add features, error handling, edge
+  cases, or extensibility points that were not requested.
+- Do not add "future-proofing" abstractions or configuration options.
+- Do not handle errors that cannot realistically occur in the current context.
+
+## No SPA leakage
+
+- No `fetch()` / `axios` calls to render content that should be
+  server-rendered.
+- No client-side state management (Redux, Pinia, stores, signals).
+- No client-side routing or history manipulation.
+- No virtual DOM, reactive bindings, or component lifecycle in the browser.
+
+## Use domain-specific naming
+
+- Use names from the business domain: `InvoiceController`, not
+  `DataController`; `billing/show.edge`, not `page.edge`.
+- Match the naming style already used in the project.
+- No generic names: `utils.ts`, `helpers.ts`, `common.ts`, `misc.ts`.
+"""
+
+
+# Keep combined for the MCP prompt (backward compat)
+ADONISJS_STACK_GUIDELINES = (
+    BACKEND_GUIDELINES + "\n---\n\n" + CODE_QUALITY_GUIDELINES + "\n---\n\n" + FRONTEND_GUIDELINES
+)
