@@ -77,7 +77,7 @@ async def fetch_doc_page(client: httpx.AsyncClient, version: str, section: str, 
     if not vinfo:
         return None
 
-    full_path = f"{vinfo['content_prefix']}/{section}/{clean_path}"
+    full_path = f"{vinfo['content_prefix']}/{clean_path}" if vinfo["nav_format"] == "flat" else f"{vinfo['content_prefix']}/{section}/{clean_path}"
     content = await _fetch_raw(client, vinfo["repo"], vinfo["branch"], full_path)
     if content is None:
         return None
@@ -117,9 +117,11 @@ def _parse_grouped_nav(data: list[dict], section: str, version: str) -> list[Doc
 
 
 def _parse_flat_nav(data: list[dict], section: str, version: str) -> list[DocCategory]:
-    """Parse v6 format: [{title, permalink, contentPath, category}]"""
+    """Parse v6/edge format: [{title, permalink, contentPath, category}]"""
     cat_map: dict[str, DocCategory] = {}
     for entry in data:
+        if entry.get("draft"):
+            continue
         category_name = entry.get("category", "Uncategorized")
         if category_name not in cat_map:
             cat_map[category_name] = DocCategory(name=category_name)

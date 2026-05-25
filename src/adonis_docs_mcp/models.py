@@ -33,7 +33,18 @@ VERSIONS = {
         "nav_format": "nested",  # [{name, categories: [{name, docs: []}]}]
         "label": "AdonisJS v5",
     },
+    "edge": {
+        "repo": "edge-js/edgejs.dev",
+        "branch": "main",
+        "content_prefix": "content/docs",
+        "sections": ["docs"],
+        "nav_file": "db.json",
+        "nav_format": "flat",
+        "label": "Edge.js (template engine)",
+    },
 }
+
+ADONIS_VERSIONS = ["v7", "v6", "v5"]
 
 
 @dataclass

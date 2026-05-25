@@ -1,6 +1,6 @@
 # adonis-docs-mcp
 
-MCP server that gives AI agents fast access to **AdonisJS documentation** (v5, v6, v7).
+MCP server that gives AI agents fast access to **AdonisJS documentation** (v5, v6, v7) and **Edge.js template engine** documentation.
 
 Fetches raw markdown directly from the official GitHub repos and caches locally for speed.
 
@@ -60,6 +60,8 @@ Add to your MCP config:
 
 ## Available Tools
 
+### AdonisJS
+
 | Tool | Description |
 |------|-------------|
 | `list_versions` | List all available AdonisJS doc versions (v5, v6, v7) |
@@ -67,6 +69,14 @@ Add to your MCP config:
 | `get_doc` | Fetch the full markdown content of a specific page |
 | `search_docs` | Search docs by keyword across titles and content |
 | `clear_cache` | Clear the local documentation cache |
+
+### Edge.js Templates
+
+| Tool | Description |
+|------|-------------|
+| `edge_list_sections` | Browse the Edge.js documentation structure |
+| `edge_get_doc` | Fetch the full markdown content of an Edge.js doc page |
+| `edge_search_docs` | Search Edge.js docs by keyword |
 
 ## Examples
 
@@ -85,6 +95,15 @@ search_docs(query="authentication", version="v7")
 
 # Search across all versions
 search_docs(query="middleware", version="all")
+
+# Browse Edge.js template docs
+edge_list_sections()
+
+# Read Edge.js components docs
+edge_get_doc(permalink="components/introduction")
+
+# Search Edge.js docs
+edge_search_docs(query="slots")
 ```
 
 ## Configuration
@@ -101,6 +120,7 @@ search_docs(query="middleware", version="all")
 | v7 | [adonisjs/v7-docs](https://github.com/adonisjs/v7-docs) | Latest (default) |
 | v6 | [adonisjs/v6-docs](https://github.com/adonisjs/v6-docs) | Stable |
 | v5 | [adonisjs/v5-docs](https://github.com/adonisjs/v5-docs) | Legacy |
+| Edge.js | [edge-js/edgejs.dev](https://github.com/edge-js/edgejs.dev) | Template engine |
 
 ## Development
 
