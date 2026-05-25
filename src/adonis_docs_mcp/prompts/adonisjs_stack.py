@@ -77,31 +77,92 @@ AdonisJS v7 and Edge.js templates. Follow these rules strictly.
 - Do not add npm packages for things that can be done with a few lines of
   vanilla JS (dropdowns, toggles, modals).
 
+---
+
 ## Anti-Slop Rules
 
-These are the most important rules. Violating them produces AI slop.
+Inspired by https://github.com/peakoss/anti-slop — these rules target the
+specific patterns that make AI-generated code low-quality. Anti-slop, not
+anti-AI: genuinely good work is fine, lazy generated slop is not.
 
-1. **No invented structure.** Follow the project's existing file layout. Do not
-   create new top-level directories or reorganize the project.
-2. **No unnecessary abstractions.** Do not create wrapper classes, utility
-   modules, or "helper" files unless there is clear, repeated usage (3+ call
-   sites).
-3. **No placeholder content.** Never output "Lorem ipsum", "TODO: implement",
-   "Add your content here", or similar. Every piece of text must be real.
-4. **No excessive comments.** Code should be self-explanatory. Only comment
-   *why*, never *what*. Do not add JSDoc/docblocks to obvious methods.
-5. **No over-engineering.** If a feature needs 10 lines, write 10 lines. Do
-   not build an extensible plugin system for a simple feature.
-6. **No technology additions.** Do not add new dependencies, frameworks, or
-   tools unless explicitly asked. Work with what's already in `package.json`.
-7. **No speculative code.** Do not add features, error handling, or edge cases
-   that were not requested. Build exactly what is asked.
-8. **No SPA patterns in a monolith.** No `fetch()` calls to render HTML that
-   should be server-rendered. No client-side state management. No virtual DOM.
-9. **No generic naming.** Use domain-specific names (`InvoiceController`, not
-   `DataController`; `billing/show.edge`, not `page.edge`).
-10. **Respect existing patterns.** Before writing new code, look at how the
-    project already does similar things and follow that pattern exactly.
+### Surgical changes only
+
+- Touch only the files directly related to what was asked. Do not "improve"
+  unrelated files, refactor nearby code, or reorganize the project.
+- Keep changes small and focused. If a task needs 10 lines, write 10 lines.
+  A 500-line diff for a simple feature is slop.
+- Do not modify root config files (`package.json`, `tsconfig.json`,
+  `.env.example`, `README.md`) unless the task explicitly requires it.
+
+### No comment spam
+
+- Do not add excessive inline comments. Code should be self-explanatory.
+- Only comment *why* something non-obvious is done, never *what* the code does.
+- Do not add file-header comments, section dividers (`// ---- Section ----`),
+  or JSDoc blocks to every function.
+- A file with more new comments than new logic is slop.
+
+### No filler content
+
+- Never output "Lorem ipsum", "TODO: implement", "Add your content here",
+  "Example text", or any placeholder.
+- Do not generate sample/demo data unless explicitly asked.
+- Every string, label, and message must be real and contextual.
+
+### No bloated output
+
+- Do not produce verbose explanations inside code. If something needs
+  explaining, a single short comment suffices.
+- Do not add multiple alternative approaches in comments ("you could also...").
+- Do not add console.log/debug statements unless debugging was requested.
+- Do not add emoji to code, commit messages, or comments.
+
+### No invented structure
+
+- Follow the project's existing file layout exactly. Look at how the project
+  organizes controllers, models, views, and services before creating files.
+- Do not create new top-level directories, new config files, or new
+  organizational patterns.
+- Name files and classes using the project's existing naming conventions —
+  check existing files first.
+
+### No unnecessary abstractions
+
+- Do not create wrapper classes, base classes, utility modules, or "helper"
+  files unless there is clear, repeated usage (3+ existing call sites).
+- Do not add design patterns (Strategy, Factory, Observer) unless the
+  complexity genuinely demands it.
+- Do not create interfaces/types for objects used in only one place.
+
+### No dependency additions
+
+- Do not add new npm packages, frameworks, or tools unless explicitly asked.
+- Work with what is already in `package.json`. Check existing dependencies
+  before suggesting new ones.
+- Especially do not add: CSS frameworks, animation libraries, icon packs,
+  utility libraries (lodash, etc.), or testing tools not already present.
+
+### No speculative code
+
+- Build exactly what was asked. Do not add features, error handling, edge
+  cases, or extensibility points that were not requested.
+- Do not add "future-proofing" abstractions or configuration options.
+- Do not handle errors that cannot realistically occur in the current context.
+
+### No SPA leakage
+
+- No `fetch()` / `axios` calls to render content that should be
+  server-rendered.
+- No client-side state management (Redux, Pinia, stores, signals).
+- No client-side routing or history manipulation.
+- No virtual DOM, reactive bindings, or component lifecycle in the browser.
+
+### Use domain-specific naming
+
+- Use names from the business domain: `InvoiceController`, not
+  `DataController`; `billing/show.edge`, not `page.edge`.
+- Match the naming style already used in the project.
+- No generic names: `utils.ts`, `helpers.ts`, `common.ts`, `misc.ts`.
 
 ## When Unsure
 
