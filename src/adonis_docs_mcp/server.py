@@ -30,7 +30,7 @@ mcp = FastMCP(
 
 def _get_client() -> httpx.AsyncClient:
     return httpx.AsyncClient(
-        headers={"User-Agent": "adonis-docs-mcp/0.3.1"},
+        headers={"User-Agent": "adonis-docs-mcp/0.4.0"},
         follow_redirects=True,
     )
 

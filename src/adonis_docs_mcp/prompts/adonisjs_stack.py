@@ -81,9 +81,9 @@ AdonisJS v7 and Edge.js templates. Follow these rules strictly.
 
 ## Anti-Slop Rules
 
-Inspired by https://github.com/peakoss/anti-slop — these rules target the
-specific patterns that make AI-generated code low-quality. Anti-slop, not
-anti-AI: genuinely good work is fine, lazy generated slop is not.
+Inspired by peakoss/anti-slop, Hallmark, and anti-slop-design — these rules
+target the specific patterns that make AI-generated code and UI low-quality.
+Anti-slop, not anti-AI: genuinely good work is fine, lazy generated slop is not.
 
 ### Surgical changes only
 
@@ -108,6 +108,8 @@ anti-AI: genuinely good work is fine, lazy generated slop is not.
   "Example text", or any placeholder.
 - Do not generate sample/demo data unless explicitly asked.
 - Every string, label, and message must be real and contextual.
+- Do not fabricate metrics ("50,000+ users", "+47% conversion") or
+  testimonials. Use real data or a labelled placeholder (`—`).
 
 ### No bloated output
 
@@ -163,6 +165,124 @@ anti-AI: genuinely good work is fine, lazy generated slop is not.
   `DataController`; `billing/show.edge`, not `page.edge`.
 - Match the naming style already used in the project.
 - No generic names: `utils.ts`, `helpers.ts`, `common.ts`, `misc.ts`.
+
+---
+
+## Frontend Anti-Slop Rules
+
+These rules specifically target the generic, "AI-averaged" look that plagues
+generated frontend code. Every page should look intentional and designed, not
+like the statistical mean of every website the AI was trained on.
+
+### Semantic HTML — no div soup
+
+- Use proper semantic elements: `<header>`, `<nav>`, `<main>`, `<article>`,
+  `<section>`, `<aside>`, `<footer>`, `<figure>`, `<figcaption>`, `<details>`,
+  `<summary>`, `<dialog>`, `<time>`, `<mark>`, `<address>`.
+- Only use `<div>` and `<span>` when no semantic element fits.
+- Keep the DOM shallow — avoid unnecessary wrapper elements. If a `<div>` is
+  only there for "structure" but has no styles or semantic purpose, remove it.
+- Use `<button>` for actions and `<a>` for navigation. Never use
+  `<div onclick>` or `<span class="link">`.
+
+### Typography — no default font stacks
+
+- Do not default to Inter, Roboto, or Open Sans for everything. Use what the
+  project already has configured, or choose fonts intentional to the domain.
+- Create clear typographic hierarchy: heading sizes should have dramatic
+  contrast, not just slightly different `font-size` values.
+- Mix font weights intentionally — a light large heading with a bold small
+  label creates more interest than everything being `font-weight: 700`.
+- Use fluid type scales (`clamp()`) instead of hardcoded pixel sizes when
+  possible.
+
+### Color — no gratuitous gradients
+
+- Do not add purple-to-blue or purple-to-pink gradients. This is the #1 tell
+  of AI-generated UI.
+- Use the project's existing color palette. If none exists, choose colors
+  intentional to the domain — a fintech app and a creative portfolio should
+  look nothing alike.
+- Avoid pure `#FFFFFF` backgrounds — use warm off-whites for a more designed
+  feel.
+- Avoid pure `#000000` for dark mode — use dark greys with subtle warmth.
+- Do not rely on color alone to convey meaning (errors, status). Always
+  pair with text, icons, or patterns for accessibility.
+
+### Layout — no centered-hero trinity
+
+- Do not default to: centered hero → three equal columns → CTA → footer.
+  This layout is the AI slop signature.
+- Use asymmetric layouts, varied column widths, full-bleed mixed with
+  contained content. Layouts should reflect the content, not a template.
+- Use CSS Grid and Flexbox purposefully. Not every container needs
+  `display: flex; align-items: center; justify-content: center`.
+
+### Spacing — no uniform gaps
+
+- Do not use the same `gap` or `padding` value everywhere. Space should
+  reflect content hierarchy: section gaps > card gaps > content gaps.
+- Use consistent spacing tokens (CSS custom properties) but vary them
+  by context. A `--space-xs` inside a card and a `--space-2xl` between
+  sections creates rhythm.
+- Avoid magic numbers — if a value like `padding: 37px` appears, it
+  should be explainable.
+
+### Borders & Shadows — no copy-paste elevation
+
+- Do not apply the same `1px solid #E5E7EB` border and
+  `box-shadow: 0 2px 4px rgba(0,0,0,0.1)` to every card.
+- Match the project's existing styling. Some designs use borders, some use
+  shadows, some use whitespace alone to separate elements.
+- Vary `border-radius` by component size — a card and a button inside it
+  should not have identical corner rounding.
+
+### Animation — respect motion preferences
+
+- Always wrap animations in `@media (prefers-reduced-motion: no-preference)`.
+  This is not optional — it is an accessibility requirement.
+- Keep animations subtle: opacity + transform, 150-200ms, ease-out. No
+  bouncing, springing, or gratuitous entrance effects unless the design
+  calls for it.
+- Do not animate everything. Static content should stay static.
+
+### Accessibility — built in, not bolted on
+
+- All interactive elements must have visible `:focus-visible` styles.
+  Never remove `outline` without providing an alternative.
+- All `<img>` must have meaningful `alt` text (not "image" or "icon").
+- Forms: every `<input>` must have a `<label>`. Use `<fieldset>` and
+  `<legend>` for groups.
+- Ensure sufficient color contrast (WCAG AA minimum: 4.5:1 for text).
+- Interactive elements must be keyboard-accessible (Tab, Enter, Escape).
+- Use appropriate HTML `type` attributes: `type="email"`, `type="tel"`,
+  `type="url"`, `type="search"`.
+
+### Responsive — mobile-first, tested at real breakpoints
+
+- Write CSS mobile-first: base styles for small screens, then
+  `@media (min-width: ...)` for larger ones.
+- Test layouts mentally at 320px, 375px, 768px, 1024px, 1440px.
+- No horizontal scroll at any viewport width.
+- Use `minmax(0, 1fr)` in grid tracks with images, never bare `1fr`.
+- Headings and buttons must never wrap awkwardly on mobile — they should
+  be readable at any width.
+
+### Icons — no Heroicons everywhere
+
+- Use the icon set already in the project. If none exists, prefer Lucide
+  or Phosphor over Heroicons for variety.
+- For content-heavy editorial pages, consider no icons — let typography
+  do the work.
+- Do not add icon libraries just for one or two icons — use inline SVG.
+
+### Component states — not just the happy path
+
+- Every interactive component should handle: default, hover, focus, active,
+  disabled, loading, and error states.
+- Do not only build the "success" version. A form without error states, a
+  button without a disabled state, or a list without an empty state is
+  incomplete.
 
 ## When Unsure
 
