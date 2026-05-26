@@ -84,6 +84,13 @@ Add to your MCP config:
 | `edge_get_doc` | Fetch the full markdown content of an Edge.js doc page |
 | `edge_search_docs` | Search Edge.js docs by keyword |
 
+### Packages Registry
+
+| Tool | Description |
+|------|-------------|
+| `packages_list` | List all AdonisJS packages, optionally filtered by category |
+| `packages_search` | Search packages by keyword (name, description, category) |
+
 ### Development Guidelines
 
 | Tool | Description |
@@ -119,6 +126,15 @@ edge_get_doc(permalink="components/introduction")
 # Search Edge.js docs
 edge_search_docs(query="slots")
 
+# List all packages
+packages_list()
+
+# List authentication packages
+packages_list(category="Authentication")
+
+# Search for a package
+packages_search(query="jwt")
+
 # Load guidelines before working on a project
 get_backend_guidelines()
 get_frontend_guidelines()
@@ -140,6 +156,7 @@ get_code_quality_guidelines()
 | v6 | [adonisjs/v6-docs](https://github.com/adonisjs/v6-docs) | Stable |
 | v5 | [adonisjs/v5-docs](https://github.com/adonisjs/v5-docs) | Legacy |
 | Edge.js | [edge-js/edgejs.dev](https://github.com/edge-js/edgejs.dev) | Template engine |
+| Packages | [adonisjs-community/adonis-packages](https://github.com/adonisjs-community/adonis-packages) | Community registry |
 
 ## Development
 

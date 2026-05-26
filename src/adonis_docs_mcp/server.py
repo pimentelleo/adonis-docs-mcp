@@ -13,6 +13,7 @@ from .fetcher import (
     get_section_structure,
 )
 from .models import VERSIONS, ADONIS_VERSIONS
+from .packages import get_all_packages
 from .prompts.adonisjs_stack import (
     ADONISJS_STACK_GUIDELINES,
     BACKEND_GUIDELINES,
@@ -23,12 +24,14 @@ from .prompts.adonisjs_stack import (
 mcp = FastMCP(
     "AdonisJS Docs",
     instructions=(
-        "Provides access to AdonisJS framework documentation (v5, v6, v7) and "
-        "Edge.js template engine documentation. "
+        "Provides access to AdonisJS framework documentation (v5, v6, v7), "
+        "Edge.js template engine documentation, and the AdonisJS community "
+        "packages registry. "
         "Use list_versions to see available AdonisJS versions, list_sections to browse "
         "the doc structure, get_doc to read a specific page, and search_docs "
         "to find relevant documentation. "
         "For Edge.js templates, use edge_list_sections, edge_get_doc, and edge_search_docs. "
+        "To discover community and official packages, use packages_list and packages_search. "
         "Before starting work on an AdonisJS v7 + Edge.js project, call "
         "get_backend_guidelines, get_frontend_guidelines, and get_code_quality_guidelines "
         "to load development rules and anti-AI-slop conventions."
@@ -38,7 +41,7 @@ mcp = FastMCP(
 
 def _get_client() -> httpx.AsyncClient:
     return httpx.AsyncClient(
-        headers={"User-Agent": "adonis-docs-mcp/0.5.0"},
+        headers={"User-Agent": "adonis-docs-mcp/0.6.0"},
         follow_redirects=True,
     )
 
@@ -357,6 +360,106 @@ async def edge_search_docs(query: str) -> str:
 
     if len(results) > 20:
         lines.append(f"  ... and {len(results) - 20} more results. Refine your query for better results.")
+
+    return "\n".join(lines)
+
+
+@mcp.tool()
+async def packages_list(category: str = "") -> str:
+    """List available AdonisJS community and official packages.
+
+    Browse the AdonisJS packages registry to discover packages for
+    authentication, database, storage, messaging, extensions, and more.
+
+    Args:
+        category: Optional category filter (e.g., "Authentication", "Database",
+                  "Extensions", "Storage", "Security", "Authorization",
+                  "Messaging", "Rendering"). Leave empty to list all.
+
+    Returns a list of packages with name, description, npm package, category,
+    and compatibility info.
+    """
+    async with _get_client() as client:
+        packages = await get_all_packages(client)
+
+    if not packages:
+        return "Failed to fetch packages from the registry."
+
+    if category:
+        cat_lower = category.lower().strip()
+        filtered = [p for p in packages if cat_lower in p.category.lower()]
+        if not filtered:
+            all_cats = sorted({p.category for p in packages})
+            return (
+                f"No packages found in category '{category}'.\n"
+                f"Available categories: {', '.join(all_cats)}"
+            )
+        packages = filtered
+
+    by_category: dict[str, list] = {}
+    for pkg in packages:
+        by_category.setdefault(pkg.category, []).append(pkg)
+
+    lines = [f"AdonisJS Packages ({len(packages)} total):", ""]
+    for cat_name in sorted(by_category):
+        lines.append(f"## {cat_name}")
+        for pkg in by_category[cat_name]:
+            compat = f" (AdonisJS {pkg.compatibility})" if pkg.compatibility else ""
+            badge = " [official]" if pkg.pkg_type == "official" else ""
+            lines.append(f"  • {pkg.name}{badge} — {pkg.description}")
+            lines.append(f"    npm: {pkg.npm}{compat}")
+        lines.append("")
+
+    return "\n".join(lines)
+
+
+@mcp.tool()
+async def packages_search(query: str) -> str:
+    """Search AdonisJS packages by keyword.
+
+    Searches package names, descriptions, keywords, and categories.
+
+    Args:
+        query: Search terms (e.g., "jwt", "queue", "auth", "mail", "cache")
+
+    Returns matching packages with details and install instructions.
+    """
+    query_lower = query.lower().strip()
+    if not query_lower:
+        return "Please provide a search query."
+
+    async with _get_client() as client:
+        packages = await get_all_packages(client)
+
+    if not packages:
+        return "Failed to fetch packages from the registry."
+
+    results = []
+    for pkg in packages:
+        searchable = " ".join([
+            pkg.name.lower(),
+            pkg.description.lower(),
+            pkg.category.lower(),
+            pkg.npm.lower(),
+            " ".join(k.lower() for k in pkg.keywords),
+        ])
+        if query_lower in searchable:
+            results.append(pkg)
+
+    if not results:
+        return f"No packages found for '{query}'."
+
+    lines = [f"Found {len(results)} package(s) for '{query}':", ""]
+    for pkg in results:
+        badge = " [official]" if pkg.pkg_type == "official" else ""
+        compat = f"AdonisJS {pkg.compatibility}" if pkg.compatibility else "unknown"
+        lines.append(f"  📦 **{pkg.name}**{badge}")
+        lines.append(f"     {pkg.description}")
+        lines.append(f"     npm: {pkg.npm} | Category: {pkg.category} | Compat: {compat}")
+        if pkg.github:
+            lines.append(f"     GitHub: {pkg.github}")
+        lines.append(f"     Install: npm i {pkg.npm}")
+        lines.append("")
 
     return "\n".join(lines)
 
