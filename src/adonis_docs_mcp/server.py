@@ -31,6 +31,8 @@ mcp = FastMCP(
         "the doc structure, get_doc to read a specific page, and search_docs "
         "to find relevant documentation. "
         "For Edge.js templates, use edge_list_sections, edge_get_doc, and edge_search_docs. "
+        "For Lucid ORM (models, queries, migrations, relationships), use "
+        "lucid_list_sections, lucid_get_doc, and lucid_search_docs. "
         "To discover community and official packages, use packages_list, packages_search, "
         "and packages_get. "
         "Before starting work on an AdonisJS v7 + Edge.js project, call "
@@ -42,7 +44,7 @@ mcp = FastMCP(
 
 def _get_client() -> httpx.AsyncClient:
     return httpx.AsyncClient(
-        headers={"User-Agent": "adonis-docs-mcp/0.7.0"},
+        headers={"User-Agent": "adonis-docs-mcp/0.8.0"},
         follow_redirects=True,
     )
 
@@ -351,6 +353,141 @@ async def edge_search_docs(query: str) -> str:
         return f"No results found for '{query}' in Edge.js docs."
 
     lines = [f"Found {len(results)} result(s) for '{query}' in Edge.js docs:", ""]
+    for r in results[:20]:
+        lines.append(f"  📄 **{r['title']}**")
+        lines.append(f"     Permalink: {r['permalink']}")
+        lines.append(f"     Category: {r['category']}")
+        if r["snippet"]:
+            lines.append(f"     Snippet: {r['snippet']}")
+        lines.append("")
+
+    if len(results) > 20:
+        lines.append(f"  ... and {len(results) - 20} more results. Refine your query for better results.")
+
+    return "\n".join(lines)
+
+
+@mcp.tool()
+async def lucid_list_sections() -> str:
+    """List all Lucid ORM documentation sections and pages.
+
+    Returns a structured list of all categories and page titles with their
+    permalinks. Covers guides, query builders, migrations, and models.
+    """
+    lines = [f"Documentation structure for {VERSIONS['lucid']['label']}:", ""]
+
+    async with _get_client() as client:
+        for section_name in VERSIONS["lucid"]["sections"]:
+            section = await get_section_structure(client, "lucid", section_name)
+            if not section:
+                lines.append(f"## {section_name} (unavailable)")
+                continue
+
+            for cat in section.categories:
+                lines.append(f"  ### {cat.name}")
+                for page in cat.pages:
+                    lines.append(f"    - {page.title} → {page.permalink}")
+                lines.append("")
+
+    return "\n".join(lines)
+
+
+@mcp.tool()
+async def lucid_get_doc(permalink: str) -> str:
+    """Get the full content of a specific Lucid ORM documentation page.
+
+    Args:
+        permalink: The page permalink (e.g., "introduction", "models",
+                   "relationships", "migrations", "select-query-builder").
+                   Use lucid_list_sections to find available permalinks.
+
+    Returns the raw markdown content of the documentation page.
+    """
+    async with _get_client() as client:
+        page = await find_page_by_permalink(client, "lucid", permalink)
+        if not page:
+            return (
+                f"Page '{permalink}' not found in Lucid ORM docs. "
+                "Use lucid_list_sections to see available pages."
+            )
+
+        content = await fetch_doc_page(client, "lucid", page.section, page.content_path)
+        if not content:
+            return f"Failed to fetch content for '{permalink}' from GitHub."
+
+        header = (
+            f"# {page.title}\n"
+            f"**Source:** Lucid ORM | **Category:** {page.category}\n"
+            f"**Permalink:** {page.permalink}\n\n---\n\n"
+        )
+        return header + content
+
+
+@mcp.tool()
+async def lucid_search_docs(query: str) -> str:
+    """Search Lucid ORM documentation by keyword.
+
+    Searches through page titles and content for matching terms.
+
+    Args:
+        query: Search terms (e.g., "relationships", "migrations", "hooks")
+
+    Returns matching documentation pages with snippets.
+    """
+    query_lower = query.lower().strip()
+    if not query_lower:
+        return "Please provide a search query."
+
+    results = []
+
+    async with _get_client() as client:
+        pages = await get_all_pages(client, "lucid")
+
+        for page in pages:
+            title_match = query_lower in page.title.lower()
+            permalink_match = query_lower in page.permalink.lower()
+
+            content_snippet = ""
+            if title_match or permalink_match:
+                content = await fetch_doc_page(
+                    client, "lucid", page.section, page.content_path
+                )
+                if content:
+                    snippet_idx = content.lower().find(query_lower)
+                    if snippet_idx >= 0:
+                        start = max(0, snippet_idx - 80)
+                        end = min(len(content), snippet_idx + len(query_lower) + 80)
+                        content_snippet = "..." + content[start:end].replace("\n", " ") + "..."
+                    else:
+                        content_snippet = content[:160].replace("\n", " ") + "..."
+                results.append({
+                    "title": page.title,
+                    "permalink": page.permalink,
+                    "category": page.category,
+                    "snippet": content_snippet,
+                    "match_type": "title" if title_match else "permalink",
+                })
+            else:
+                content = await fetch_doc_page(
+                    client, "lucid", page.section, page.content_path
+                )
+                if content and query_lower in content.lower():
+                    snippet_idx = content.lower().find(query_lower)
+                    start = max(0, snippet_idx - 80)
+                    end = min(len(content), snippet_idx + len(query_lower) + 80)
+                    content_snippet = "..." + content[start:end].replace("\n", " ") + "..."
+                    results.append({
+                        "title": page.title,
+                        "permalink": page.permalink,
+                        "category": page.category,
+                        "snippet": content_snippet,
+                        "match_type": "content",
+                    })
+
+    if not results:
+        return f"No results found for '{query}' in Lucid ORM docs."
+
+    lines = [f"Found {len(results)} result(s) for '{query}' in Lucid ORM docs:", ""]
     for r in results[:20]:
         lines.append(f"  📄 **{r['title']}**")
         lines.append(f"     Permalink: {r['permalink']}")

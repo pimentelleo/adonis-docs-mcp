@@ -78,6 +78,14 @@ Add to your MCP config:
 | `edge_get_doc` | Fetch the full markdown content of an Edge.js doc page |
 | `edge_search_docs` | Search Edge.js docs by keyword |
 
+### Lucid ORM
+
+| Tool | Description |
+|------|-------------|
+| `lucid_list_sections` | Browse the Lucid ORM documentation structure |
+| `lucid_get_doc` | Fetch the full markdown content of a Lucid ORM doc page |
+| `lucid_search_docs` | Search Lucid ORM docs by keyword |
+
 ### Packages Registry
 
 | Tool | Description |
@@ -121,6 +129,15 @@ edge_get_doc(permalink="components/introduction")
 # Search Edge.js docs
 edge_search_docs(query="slots")
 
+# Browse Lucid ORM docs
+lucid_list_sections()
+
+# Read Lucid relationships docs
+lucid_get_doc(permalink="relationships")
+
+# Search Lucid ORM docs
+lucid_search_docs(query="migrations")
+
 # List all packages
 packages_list()
 
@@ -154,6 +171,7 @@ get_code_quality_guidelines()
 | v6 | [adonisjs/v6-docs](https://github.com/adonisjs/v6-docs) | Stable |
 | v5 | [adonisjs/v5-docs](https://github.com/adonisjs/v5-docs) | Legacy |
 | Edge.js | [edge-js/edgejs.dev](https://github.com/edge-js/edgejs.dev) | Template engine |
+| Lucid ORM | [adonisjs/lucid.adonisjs.com](https://github.com/adonisjs/lucid.adonisjs.com) | SQL ORM |
 | Packages | [adonisjs-community/adonis-packages](https://github.com/adonisjs-community/adonis-packages) | Community registry |
 
 ## Development

@@ -42,6 +42,15 @@ VERSIONS = {
         "nav_format": "flat",
         "label": "Edge.js (template engine)",
     },
+    "lucid": {
+        "repo": "adonisjs/lucid.adonisjs.com",
+        "branch": "main",
+        "content_prefix": "content/docs",
+        "sections": ["docs"],
+        "nav_file": "db.json",
+        "nav_format": "flat",
+        "label": "Lucid ORM",
+    },
 }
 
 ADONIS_VERSIONS = ["v7", "v6", "v5"]
