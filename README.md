@@ -58,6 +58,71 @@ Add to your MCP config:
 }
 ```
 
+## AGENTS.md for Your Project
+
+To make sure AI agents always use this MCP when working on your AdonisJS project, add an `AGENTS.md` file to your project root. You can generate one by calling the `get_agents_md` tool, or copy the template below:
+
+<details>
+<summary>Click to expand AGENTS.md template</summary>
+
+```markdown
+# AGENTS.md
+
+This project is built with **AdonisJS v7** and **Edge.js** templates
+(server-rendered monolith). An MCP server is available with documentation
+and development guidelines — **use it before guessing**.
+
+## Before You Start
+
+1. Call `get_backend_guidelines` — architecture rules, Edge template
+   conventions, controller patterns, forms, models, and assets.
+2. Call `get_frontend_guidelines` — anti-slop rules for HTML, CSS, and UI
+   development in Edge templates.
+3. Call `get_code_quality_guidelines` — anti-slop rules for code changes
+   (surgical edits, no bloat, no filler, domain naming).
+
+## When You Need Documentation
+
+- **AdonisJS v7 docs:** `search_docs(query="...", version="v7")` or
+  `get_doc(permalink="...", version="v7")`. Use `list_sections(version="v7")`
+  to browse available pages.
+- **Edge.js templates:** `edge_search_docs(query="...")` or
+  `edge_get_doc(permalink="...")`. Use `edge_list_sections()` to browse.
+- **Lucid ORM (models, queries, migrations):**
+  `lucid_search_docs(query="...")` or `lucid_get_doc(permalink="...")`.
+  Use `lucid_list_sections()` to browse.
+- **Community packages:** `packages_search(query="...")` to find packages,
+  `packages_get(name="...")` to read full README with install/usage docs.
+
+## Key Rules
+
+- This is a **server-rendered app**, not a SPA. Do not introduce React, Vue,
+  Svelte, or any frontend framework.
+- Controllers render Edge views directly. No REST API for frontend consumption.
+- Use Edge layouts, partials, and components — do not duplicate HTML structure.
+- Validate with VineJS validators, not manually in controllers.
+- Use Lucid ORM models with migrations. Never modify the database directly.
+- Follow the existing project structure. Do not invent new directories or
+  patterns.
+- Do not add npm packages unless explicitly asked. Work with what is already
+  in `package.json`.
+- Keep changes surgical — only touch files related to the task.
+- Read existing code before adding new code. Match naming conventions.
+
+## Stack Reference
+
+| Layer | Technology | Docs Tool |
+|-------|-----------|-----------|
+| Framework | AdonisJS v7 | `search_docs`, `get_doc` |
+| Templates | Edge.js | `edge_search_docs`, `edge_get_doc` |
+| ORM | Lucid | `lucid_search_docs`, `lucid_get_doc` |
+| Validation | VineJS | `search_docs(query="validation")` |
+| Auth | @adonisjs/auth | `search_docs(query="auth")` |
+| Packages | Community registry | `packages_search`, `packages_get` |
+```
+
+</details>
+
 ## Available Tools
 
 ### AdonisJS
@@ -101,6 +166,7 @@ Add to your MCP config:
 | `get_backend_guidelines` | AdonisJS v7 backend rules: architecture, Edge templates, controllers, forms, models, assets |
 | `get_frontend_guidelines` | Frontend anti-slop rules: semantic HTML, typography, color, layout, spacing, accessibility |
 | `get_code_quality_guidelines` | Code quality anti-slop rules: surgical changes, no comment spam, no bloat, domain naming |
+| `get_agents_md` | Generate an AGENTS.md file template for your AdonisJS project |
 
 ## Examples
 

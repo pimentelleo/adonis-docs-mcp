@@ -20,6 +20,7 @@ from .prompts.adonisjs_stack import (
     CODE_QUALITY_GUIDELINES,
     FRONTEND_GUIDELINES,
 )
+from .prompts.agents_md import AGENTS_MD_TEMPLATE
 
 mcp = FastMCP(
     "AdonisJS Docs",
@@ -44,7 +45,7 @@ mcp = FastMCP(
 
 def _get_client() -> httpx.AsyncClient:
     return httpx.AsyncClient(
-        headers={"User-Agent": "adonis-docs-mcp/0.8.0"},
+        headers={"User-Agent": "adonis-docs-mcp/0.9.0"},
         follow_redirects=True,
     )
 
@@ -697,6 +698,18 @@ async def get_code_quality_guidelines() -> str:
     Call this before making any code changes to an AdonisJS project.
     """
     return CODE_QUALITY_GUIDELINES
+
+
+@mcp.tool()
+async def get_agents_md() -> str:
+    """Get a ready-to-use AGENTS.md file for AdonisJS v7 + Edge.js projects.
+
+    Returns an AGENTS.md template that instructs AI coding agents to use
+    the adonis-docs-mcp tools for documentation, guidelines, and package
+    discovery. Drop this file in the root of your AdonisJS project so
+    agents automatically know how to work with the codebase.
+    """
+    return AGENTS_MD_TEMPLATE
 
 
 @mcp.tool()
