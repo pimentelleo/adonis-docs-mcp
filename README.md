@@ -58,12 +58,6 @@ Add to your MCP config:
 }
 ```
 
-## Available Prompts
-
-| Prompt | Description |
-|--------|-------------|
-| `adonisjs_stack` | Anti-AI-slop development guidelines for AdonisJS v7 + Edge.js monolithic projects. Covers architecture constraints, Edge template conventions, controller patterns, form handling, asset management, and 10 strict anti-slop rules. |
-
 ## Available Tools
 
 ### AdonisJS
