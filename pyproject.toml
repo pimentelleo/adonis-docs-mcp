@@ -1,6 +1,6 @@
 [project]
 name = "adonis-docs-mcp"
-version = "0.6.0"
+version = "0.7.0"
 description = "MCP server for AdonisJS documentation (v5, v6, v7) — gives AI agents quick access to AdonisJS docs"
 readme = "README.md"
 requires-python = ">=3.11"

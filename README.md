@@ -90,6 +90,7 @@ Add to your MCP config:
 |------|-------------|
 | `packages_list` | List all AdonisJS packages, optionally filtered by category |
 | `packages_search` | Search packages by keyword (name, description, category) |
+| `packages_get` | Get full details and README for a specific package |
 
 ### Development Guidelines
 
@@ -134,6 +135,9 @@ packages_list(category="Authentication")
 
 # Search for a package
 packages_search(query="jwt")
+
+# Get full details and README for a package
+packages_get(name="adonisjs-jwt")
 
 # Load guidelines before working on a project
 get_backend_guidelines()

@@ -135,3 +135,66 @@ async def get_all_packages(client: httpx.AsyncClient) -> list[PackageInfo]:
                 packages.append(pkg)
 
     return packages
+
+
+async def get_package_readme(client: httpx.AsyncClient, pkg: PackageInfo) -> str | None:
+    """Fetch the README from a package's GitHub repo."""
+    if not pkg.repo:
+        return None
+
+    # repo field can be "owner/repo#branch" or just "owner/repo"
+    repo = pkg.repo
+    branch = "main"
+    if "#" in repo:
+        repo, branch = repo.rsplit("#", 1)
+
+    cache_key = f"readme/{repo}"
+    cached = cache.get(_CACHE_NS, cache_key)
+    if cached is not None:
+        return cached
+
+    # Try common README filenames
+    for readme_name in ("README.md", "readme.md", "Readme.md"):
+        url = f"{RAW_BASE}/{repo}/{branch}/{readme_name}"
+        try:
+            resp = await client.get(url, timeout=TIMEOUT)
+            if resp.status_code == 200:
+                cache.put(_CACHE_NS, cache_key, resp.text)
+                return resp.text
+        except httpx.HTTPError:
+            continue
+
+    # Retry with "master" if "main" failed and no branch was specified
+    if branch == "main" and "#" not in pkg.repo:
+        for readme_name in ("README.md", "readme.md"):
+            url = f"{RAW_BASE}/{repo}/master/{readme_name}"
+            try:
+                resp = await client.get(url, timeout=TIMEOUT)
+                if resp.status_code == 200:
+                    cache.put(_CACHE_NS, cache_key, resp.text)
+                    return resp.text
+            except httpx.HTTPError:
+                continue
+
+    logger.warning("No README found for %s", repo)
+    return None
+
+
+async def find_package_by_name(
+    client: httpx.AsyncClient, name: str
+) -> PackageInfo | None:
+    """Find a package by name (case-insensitive, partial match)."""
+    packages = await get_all_packages(client)
+    name_lower = name.lower().strip()
+
+    # Exact match first
+    for pkg in packages:
+        if pkg.name.lower() == name_lower or pkg.npm.lower() == name_lower:
+            return pkg
+
+    # Partial match
+    for pkg in packages:
+        if name_lower in pkg.name.lower() or name_lower in pkg.npm.lower():
+            return pkg
+
+    return None

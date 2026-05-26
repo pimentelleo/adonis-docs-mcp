@@ -13,7 +13,7 @@ from .fetcher import (
     get_section_structure,
 )
 from .models import VERSIONS, ADONIS_VERSIONS
-from .packages import get_all_packages
+from .packages import get_all_packages, find_package_by_name, get_package_readme
 from .prompts.adonisjs_stack import (
     ADONISJS_STACK_GUIDELINES,
     BACKEND_GUIDELINES,
@@ -31,7 +31,8 @@ mcp = FastMCP(
         "the doc structure, get_doc to read a specific page, and search_docs "
         "to find relevant documentation. "
         "For Edge.js templates, use edge_list_sections, edge_get_doc, and edge_search_docs. "
-        "To discover community and official packages, use packages_list and packages_search. "
+        "To discover community and official packages, use packages_list, packages_search, "
+        "and packages_get. "
         "Before starting work on an AdonisJS v7 + Edge.js project, call "
         "get_backend_guidelines, get_frontend_guidelines, and get_code_quality_guidelines "
         "to load development rules and anti-AI-slop conventions."
@@ -41,7 +42,7 @@ mcp = FastMCP(
 
 def _get_client() -> httpx.AsyncClient:
     return httpx.AsyncClient(
-        headers={"User-Agent": "adonis-docs-mcp/0.6.0"},
+        headers={"User-Agent": "adonis-docs-mcp/0.7.0"},
         follow_redirects=True,
     )
 
@@ -462,6 +463,61 @@ async def packages_search(query: str) -> str:
         lines.append("")
 
     return "\n".join(lines)
+
+
+@mcp.tool()
+async def packages_get(name: str) -> str:
+    """Get detailed information about a specific AdonisJS package.
+
+    Fetches the package metadata and its full README from GitHub, including
+    installation instructions, configuration, and usage examples.
+
+    Args:
+        name: Package name or npm package name (e.g., "adonisjs-jwt",
+              "@adonisjs/cache", "lucid", "ally").
+
+    Returns package details and full README content.
+    """
+    async with _get_client() as client:
+        pkg = await find_package_by_name(client, name)
+        if not pkg:
+            return (
+                f"Package '{name}' not found. "
+                "Use packages_search or packages_list to find available packages."
+            )
+
+        badge = " [official]" if pkg.pkg_type == "official" else " [3rd-party]"
+        compat = f"AdonisJS {pkg.compatibility}" if pkg.compatibility else "unknown"
+
+        lines = [
+            f"# {pkg.name}{badge}",
+            f"",
+            f"**Description:** {pkg.description}",
+            f"**Category:** {pkg.category}",
+            f"**npm:** {pkg.npm}",
+            f"**Compatibility:** {compat}",
+            f"**Install:** npm i {pkg.npm}",
+        ]
+        if pkg.github:
+            lines.append(f"**GitHub:** {pkg.github}")
+        if pkg.website and pkg.website != pkg.github:
+            lines.append(f"**Website:** {pkg.website}")
+        if pkg.maintainers:
+            lines.append(f"**Maintainers:** {', '.join(pkg.maintainers)}")
+        if pkg.keywords:
+            lines.append(f"**Keywords:** {', '.join(pkg.keywords)}")
+
+        readme = await get_package_readme(client, pkg)
+        if readme:
+            lines.append("")
+            lines.append("---")
+            lines.append("")
+            lines.append(readme)
+        else:
+            lines.append("")
+            lines.append("(README not available — check the GitHub link above)")
+
+        return "\n".join(lines)
 
 
 @mcp.tool()
