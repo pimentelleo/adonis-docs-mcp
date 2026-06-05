@@ -683,60 +683,6 @@ async def packages_get(name: str) -> str:
 
 
 @mcp.tool()
-async def get_backend_guidelines() -> str:
-    """Get AdonisJS v7 backend development guidelines.
-
-    Returns architecture rules, Edge template conventions, controller patterns,
-    form/validation rules, model/database conventions, and asset handling for
-    server-rendered monolithic AdonisJS v7 + Edge.js applications.
-
-    Call this before working on AdonisJS backend code (routes, controllers,
-    models, services, validators, Edge views).
-    """
-    return BACKEND_GUIDELINES
-
-
-@mcp.tool()
-async def get_frontend_guidelines() -> str:
-    """Get frontend anti-slop guidelines for HTML, CSS, and UI development.
-
-    Returns rules for writing high-quality frontend code in Edge templates:
-    semantic HTML, typography, color, layout, spacing, borders/shadows,
-    animation, accessibility, responsive design, icons, and component states.
-
-    These rules prevent the generic "AI-averaged" look that plagues generated
-    frontend code. Call this before writing or editing HTML/CSS in Edge templates.
-    """
-    return FRONTEND_GUIDELINES
-
-
-@mcp.tool()
-async def get_code_quality_guidelines() -> str:
-    """Get anti-slop code quality rules for any code changes.
-
-    Returns rules to prevent low-quality AI-generated code: surgical changes
-    only, no comment spam, no filler content, no bloated output, no invented
-    structure, no unnecessary abstractions, no dependency additions, no
-    speculative code, no SPA leakage, and domain-specific naming.
-
-    Call this before making any code changes to an AdonisJS project.
-    """
-    return CODE_QUALITY_GUIDELINES
-
-
-@mcp.tool()
-async def get_agents_md() -> str:
-    """Get a ready-to-use AGENTS.md file for AdonisJS v7 + Edge.js projects.
-
-    Returns an AGENTS.md template that instructs AI coding agents to use
-    the adonis-docs-mcp tools for documentation, guidelines, and package
-    discovery. Drop this file in the root of your AdonisJS project so
-    agents automatically know how to work with the codebase.
-    """
-    return AGENTS_MD_TEMPLATE
-
-
-@mcp.tool()
 async def clear_cache() -> str:
     """Clear the local documentation cache.
 
