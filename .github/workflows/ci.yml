@@ -25,6 +25,11 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
+      - name: Run mypy
+        run: |
+          uv pip install mypy types-PyYAML
+          uv run mypy src/
+
       - name: Check import
         run: uv run python -c "from adonis_docs_mcp.server import mcp; print('OK:', mcp.name)"
 

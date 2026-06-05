@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import httpx
 from mcp.server.fastmcp import FastMCP
 
@@ -166,20 +167,22 @@ async def search_docs(query: str, version: str = "v7") -> str:
                 continue
 
             pages = await get_all_pages(client, ver)
-
-            for page in pages:
+            
+            # Limit concurrency to 15 parallel requests
+            sem = asyncio.Semaphore(15)
+            
+            async def process_page(page):
                 # Title match
                 title_match = query_lower in page.title.lower()
 
                 # Permalink match
                 permalink_match = query_lower in page.permalink.lower()
 
-                # Content match (fetch only if title/permalink don't match)
                 content_snippet = ""
                 if title_match or permalink_match:
-                    content = await fetch_doc_page(
-                        client, ver, page.section, page.content_path
-                    )
+                    async with sem:
+                        content = await fetch_doc_page(client, ver, page.section, page.content_path)
+                        
                     if content:
                         snippet_idx = content.lower().find(query_lower)
                         if snippet_idx >= 0:
@@ -188,7 +191,8 @@ async def search_docs(query: str, version: str = "v7") -> str:
                             content_snippet = "..." + content[start:end].replace("\n", " ") + "..."
                         else:
                             content_snippet = content[:160].replace("\n", " ") + "..."
-                    results.append({
+                            
+                    return {
                         "title": page.title,
                         "permalink": page.permalink,
                         "version": ver,
@@ -196,18 +200,18 @@ async def search_docs(query: str, version: str = "v7") -> str:
                         "category": page.category,
                         "snippet": content_snippet,
                         "match_type": "title" if title_match else "permalink",
-                    })
+                    }
                 else:
                     # Try content search
-                    content = await fetch_doc_page(
-                        client, ver, page.section, page.content_path
-                    )
+                    async with sem:
+                        content = await fetch_doc_page(client, ver, page.section, page.content_path)
+                        
                     if content and query_lower in content.lower():
                         snippet_idx = content.lower().find(query_lower)
                         start = max(0, snippet_idx - 80)
                         end = min(len(content), snippet_idx + len(query_lower) + 80)
                         content_snippet = "..." + content[start:end].replace("\n", " ") + "..."
-                        results.append({
+                        return {
                             "title": page.title,
                             "permalink": page.permalink,
                             "version": ver,
@@ -215,7 +219,11 @@ async def search_docs(query: str, version: str = "v7") -> str:
                             "category": page.category,
                             "snippet": content_snippet,
                             "match_type": "content",
-                        })
+                        }
+                return None
+
+            page_results = await asyncio.gather(*(process_page(p) for p in pages))
+            results.extend([r for r in page_results if r is not None])
 
     if not results:
         return f"No results found for '{query}' in {version}."
@@ -309,15 +317,18 @@ async def edge_search_docs(query: str) -> str:
     async with _get_client() as client:
         pages = await get_all_pages(client, "edge")
 
-        for page in pages:
+        # Limit concurrency to 15 parallel requests
+        sem = asyncio.Semaphore(15)
+
+        async def process_edge_page(page):
             title_match = query_lower in page.title.lower()
             permalink_match = query_lower in page.permalink.lower()
 
             content_snippet = ""
             if title_match or permalink_match:
-                content = await fetch_doc_page(
-                    client, "edge", page.section, page.content_path
-                )
+                async with sem:
+                    content = await fetch_doc_page(client, "edge", page.section, page.content_path)
+                    
                 if content:
                     snippet_idx = content.lower().find(query_lower)
                     if snippet_idx >= 0:
@@ -326,29 +337,34 @@ async def edge_search_docs(query: str) -> str:
                         content_snippet = "..." + content[start:end].replace("\n", " ") + "..."
                     else:
                         content_snippet = content[:160].replace("\n", " ") + "..."
-                results.append({
+                        
+                return {
                     "title": page.title,
                     "permalink": page.permalink,
                     "category": page.category,
                     "snippet": content_snippet,
                     "match_type": "title" if title_match else "permalink",
-                })
+                }
             else:
-                content = await fetch_doc_page(
-                    client, "edge", page.section, page.content_path
-                )
+                async with sem:
+                    content = await fetch_doc_page(client, "edge", page.section, page.content_path)
+                    
                 if content and query_lower in content.lower():
                     snippet_idx = content.lower().find(query_lower)
                     start = max(0, snippet_idx - 80)
                     end = min(len(content), snippet_idx + len(query_lower) + 80)
                     content_snippet = "..." + content[start:end].replace("\n", " ") + "..."
-                    results.append({
+                    return {
                         "title": page.title,
                         "permalink": page.permalink,
                         "category": page.category,
                         "snippet": content_snippet,
                         "match_type": "content",
-                    })
+                    }
+            return None
+
+        page_results = await asyncio.gather(*(process_edge_page(p) for p in pages))
+        results.extend([r for r in page_results if r is not None])
 
     if not results:
         return f"No results found for '{query}' in Edge.js docs."
@@ -444,15 +460,18 @@ async def lucid_search_docs(query: str) -> str:
     async with _get_client() as client:
         pages = await get_all_pages(client, "lucid")
 
-        for page in pages:
+        # Limit concurrency to 15 parallel requests
+        sem = asyncio.Semaphore(15)
+
+        async def process_lucid_page(page):
             title_match = query_lower in page.title.lower()
             permalink_match = query_lower in page.permalink.lower()
 
             content_snippet = ""
             if title_match or permalink_match:
-                content = await fetch_doc_page(
-                    client, "lucid", page.section, page.content_path
-                )
+                async with sem:
+                    content = await fetch_doc_page(client, "lucid", page.section, page.content_path)
+                    
                 if content:
                     snippet_idx = content.lower().find(query_lower)
                     if snippet_idx >= 0:
@@ -461,29 +480,34 @@ async def lucid_search_docs(query: str) -> str:
                         content_snippet = "..." + content[start:end].replace("\n", " ") + "..."
                     else:
                         content_snippet = content[:160].replace("\n", " ") + "..."
-                results.append({
+                        
+                return {
                     "title": page.title,
                     "permalink": page.permalink,
                     "category": page.category,
                     "snippet": content_snippet,
                     "match_type": "title" if title_match else "permalink",
-                })
+                }
             else:
-                content = await fetch_doc_page(
-                    client, "lucid", page.section, page.content_path
-                )
+                async with sem:
+                    content = await fetch_doc_page(client, "lucid", page.section, page.content_path)
+                    
                 if content and query_lower in content.lower():
                     snippet_idx = content.lower().find(query_lower)
                     start = max(0, snippet_idx - 80)
                     end = min(len(content), snippet_idx + len(query_lower) + 80)
                     content_snippet = "..." + content[start:end].replace("\n", " ") + "..."
-                    results.append({
+                    return {
                         "title": page.title,
                         "permalink": page.permalink,
                         "category": page.category,
                         "snippet": content_snippet,
                         "match_type": "content",
-                    })
+                    }
+            return None
+
+        page_results = await asyncio.gather(*(process_lucid_page(p) for p in pages))
+        results.extend([r for r in page_results if r is not None])
 
     if not results:
         return f"No results found for '{query}' in Lucid ORM docs."

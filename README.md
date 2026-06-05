@@ -76,8 +76,8 @@ and development guidelines — **use it before guessing**.
 
 1. Call `get_backend_guidelines` — architecture rules, Edge template
    conventions, controller patterns, forms, models, and assets.
-2. Call `get_frontend_guidelines` — anti-slop rules for HTML, CSS, and UI
-   development in Edge templates.
+2. Call `get_frontend_guidelines` — rules for HTML, CSS, and UI
+   development in Edge templates (semantic HTML, accessibility, responsive).
 3. Call `get_code_quality_guidelines` — anti-slop rules for code changes
    (surgical edits, no bloat, no filler, domain naming).
 
@@ -164,7 +164,7 @@ and development guidelines — **use it before guessing**.
 | Tool | Description |
 |------|-------------|
 | `get_backend_guidelines` | AdonisJS v7 backend rules: architecture, Edge templates, controllers, forms, models, assets |
-| `get_frontend_guidelines` | Frontend anti-slop rules: semantic HTML, typography, color, layout, spacing, accessibility |
+| `get_frontend_guidelines` | Frontend rules: semantic HTML, typography, layout, responsiveness, accessibility |
 | `get_code_quality_guidelines` | Code quality anti-slop rules: surgical changes, no comment spam, no bloat, domain naming |
 | `get_agents_md` | Generate an AGENTS.md file template for your AdonisJS project |
 

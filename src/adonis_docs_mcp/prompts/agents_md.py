@@ -11,9 +11,9 @@ and development guidelines — **use it before guessing**.
 
 1. Call `get_backend_guidelines` — architecture rules, Edge template
    conventions, controller patterns, forms, models, and assets.
-2. Call `get_frontend_guidelines` — anti-slop rules for HTML, CSS, and UI
-   development in Edge templates.
-3. Call `get_code_quality_guidelines` — anti-slop rules for code changes
+2. Call `get_frontend_guidelines` — rules for HTML, CSS, and UI
+   development in Edge templates (semantic HTML, accessibility, responsive).
+3. Call `get_code_quality_guidelines` — rules for code changes
    (surgical edits, no bloat, no filler, domain naming).
 
 ## When You Need Documentation

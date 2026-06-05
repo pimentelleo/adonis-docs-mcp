@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 
@@ -53,7 +54,9 @@ async def fetch_nav_json(client: httpx.AsyncClient, version: str, section: str) 
     else:
         path = f"{vinfo['content_prefix']}/{section}/{nav_file}"
 
-    content = await _fetch_raw(client, vinfo["repo"], vinfo["branch"], path)
+    repo: str = str(vinfo["repo"])
+    branch: str = str(vinfo["branch"])
+    content = await _fetch_raw(client, repo, branch, path)
     if content is None:
         return None
 
@@ -78,7 +81,9 @@ async def fetch_doc_page(client: httpx.AsyncClient, version: str, section: str, 
         return None
 
     full_path = f"{vinfo['content_prefix']}/{clean_path}" if vinfo["nav_format"] == "flat" else f"{vinfo['content_prefix']}/{section}/{clean_path}"
-    content = await _fetch_raw(client, vinfo["repo"], vinfo["branch"], full_path)
+    repo: str = str(vinfo["repo"])
+    branch: str = str(vinfo["branch"])
+    content = await _fetch_raw(client, repo, branch, full_path)
     if content is None:
         return None
 
@@ -183,12 +188,18 @@ async def get_all_pages(client: httpx.AsyncClient, version: str) -> list[DocPage
     if not vinfo:
         return []
 
-    all_pages = []
-    for section_name in vinfo["sections"]:
+    # Fetch sections concurrently
+    async def fetch_section(section_name: str) -> list[DocPage]:
         section = await get_section_structure(client, version, section_name)
         if section:
-            for cat in section.categories:
-                all_pages.extend(cat.pages)
+            return [page for cat in section.categories for page in cat.pages]
+        return []
+
+    results = await asyncio.gather(*(fetch_section(name) for name in vinfo["sections"]))
+    
+    all_pages = []
+    for pages in results:
+        all_pages.extend(pages)
 
     return all_pages
 

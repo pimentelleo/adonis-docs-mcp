@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 from dataclasses import dataclass
@@ -51,10 +52,10 @@ def _parse_package_yaml(raw: str) -> PackageInfo | None:
         compat = data.get("compatibility", {})
         adonis_compat = compat.get("adonis", "") if isinstance(compat, dict) else ""
 
-        maintainers = []
+        maintainers: list[str] = []
         for m in data.get("maintainers", []):
             if isinstance(m, dict):
-                maintainers.append(m.get("name", m.get("github", "")))
+                maintainers.append(str(m.get("name", m.get("github", ""))))
             elif isinstance(m, str):
                 maintainers.append(m)
 
@@ -127,12 +128,21 @@ async def get_all_packages(client: httpx.AsyncClient) -> list[PackageInfo]:
     filenames = await _fetch_file_list(client)
     packages: list[PackageInfo] = []
 
-    for filename in filenames:
-        raw = await _fetch_package_yaml(client, filename)
-        if raw:
-            pkg = _parse_package_yaml(raw)
-            if pkg:
-                packages.append(pkg)
+    # Limit concurrency to 15 to avoid github rate limits/disconnects
+    sem = asyncio.Semaphore(15)
+
+    async def fetch_and_parse(filename: str) -> PackageInfo | None:
+        async with sem:
+            raw = await _fetch_package_yaml(client, filename)
+            if raw:
+                return _parse_package_yaml(raw)
+            return None
+
+    results = await asyncio.gather(*(fetch_and_parse(f) for f in filenames))
+    
+    for pkg in results:
+        if pkg:
+            packages.append(pkg)
 
     return packages
 
